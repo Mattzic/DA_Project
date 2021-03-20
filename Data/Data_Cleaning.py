@@ -16,15 +16,21 @@ def Read_Data():
     # data.drop('Unnamed: 0',axis=1, inplace=True)
     return data
 
+#=========================================================================================================================================    
+
 # Assign names to columns
 def Name_Columns(data):
     data.columns = Columns
     return data
+    
+#=========================================================================================================================================      
 
 # Fill Nan's in 'Orgnisation' with 'Private Advertiser'
 def Set_Orgnisation(data):
     data.Orgnisation.fillna('Private Advertiser', inplace=True)
     return data
+    
+#=========================================================================================================================================    
 
 # Extract salary info from 'Classification' and make a new column 'Salary'
 def Extract_Salary(data):
@@ -36,6 +42,8 @@ def Extract_Salary(data):
     data['Salary'] = data.Classification.apply(apply_saraly)
     return data
 
+#=========================================================================================================================================    
+  
 # Clean salary info in 'Classificaiton'
 def Clean_SaInfo(data):
     def clean_salary(a):
@@ -46,12 +54,16 @@ def Clean_SaInfo(data):
     data.Classification = data.Classification.apply(clean_salary)
     return data
 
+#=========================================================================================================================================      
+
 def deduplication(x):
     x = x.strip()
     if x == 'None':
         return 'None'
     return re.match(r'(.*)\1', x).group(1)
-
+    
+#=========================================================================================================================================    
+    
 def Clean_Classification(data):
     data = Extract_Salary(data)
     data = Clean_SaInfo(data)
@@ -71,7 +83,8 @@ def Clean_Classification(data):
     data.Classification = data.Classification.apply(deduplication)
     return data
 
-# Clean 'Location'
+#=========================================================================================================================================        
+
 def Clean_Location(data):
     
     # Split 'Location' into 'Location' and 'Area' 
@@ -82,7 +95,8 @@ def Clean_Location(data):
     data.Location = data.Location.apply(deduplication)
     return data
 
-# Clean 'Area'
+#=========================================================================================================================================        
+
 def Clean_Area(data):
     
     # Get rid of salary info from 'Area'
@@ -92,8 +106,9 @@ def Clean_Area(data):
     data.Area = data.Area.astype('str')
     data.Area = data.Area.apply(deduplication)
     return data
-
-# Clean 'Time_Posted'
+    
+#=========================================================================================================================================      
+  
 def Clean_Time_Posted(data):
     
     # If not in some form similar to '7d ago', set it to 0
@@ -121,7 +136,8 @@ def Clean_Time_Posted(data):
     data['Time_Posted'] = data['Time_Posted'].apply(date_transfer)
     return data
 
-# Clean 'Salary'
+#=========================================================================================================================================        
+
 def Clean_Salary(data):
     
     # Get rid of ','
@@ -133,6 +149,8 @@ def Clean_Salary(data):
     data.drop('Salary', axis=1, inplace=True)
     
     return data
+
+#=========================================================================================================================================       
 
 # 1.Check if the str contains digits
 # 2. If it does, check if it is a percentage
@@ -157,6 +175,8 @@ def to_annual(x):
                 pass
     return x
 
+#=========================================================================================================================================       
+
 # Find max and min in some column
 def Find_Value(data, column):
     df1 = data[data[column].str.contains(r'\d$', regex=True, na=False)][column]
@@ -164,7 +184,8 @@ def Find_Value(data, column):
     df1 = df1.astype('float')
     return df1.max(),df1.min()
 
-# Clean 'Lo_Salary'
+#=========================================================================================================================================        
+
 def Clean_LSalary(data):
     data['Lo_Salary'] = data['Lo_Salary'].astype('str')
 
@@ -201,7 +222,8 @@ def Clean_LSalary(data):
 
     return data
 
-# Clean 'Hi_Salary'
+#=========================================================================================================================================        
+
 def Clean_HSalary(data):
     data['Hi_Salary'] = data['Hi_Salary'].astype('str')
     data['Hi_Salary'] = data['Hi_Salary'].str.replace(r'(\d+)\s(\d+)', r'\1\2', regex=True)
@@ -230,6 +252,8 @@ def Clean_HSalary(data):
             data.loc[i, 'Hi_Salary'] = num
 
     return data
+
+#=========================================================================================================================================        
 
 def Clean(data):
     data = Name_Columns(data)
