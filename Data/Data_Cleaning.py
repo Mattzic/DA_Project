@@ -36,7 +36,7 @@ def Set_Orgnisation(data):
 def Extract_Salary(data):
     def apply_saraly(a):
         if 'classification:' in a:
-            return None
+            return 'None'
         else:
             return a
     data['Salary'] = data.Classification.apply(apply_saraly)
@@ -81,6 +81,13 @@ def Clean_Classification(data):
     # Set 'Classification' dtype to str and deduplicate 'Classification'
     data.Classification = data.Classification.astype('str')
     data.Classification = data.Classification.apply(deduplication)
+
+    data.Classification = data.Classification.astype('str')
+    data.Classification = data.Classification.apply(CleanNone) 
+    
+    data.Subclassification = data.Subclassification.astype('str')
+    data.Subclassification = data.Subclassification.apply(CleanNone)
+
     return data
 
 #=========================================================================================================================================        
@@ -93,6 +100,9 @@ def Clean_Location(data):
     # Get rid of 'location:' in 'Location' and deduplicate 'Location'
     data.Location = data.Location.str.replace('location:','')
     data.Location = data.Location.apply(deduplication)
+
+    data.Location = data.Location.astype('str')
+    data.Location = data.Location.apply(CleanNone)    
     return data
 
 #=========================================================================================================================================        
@@ -105,6 +115,9 @@ def Clean_Area(data):
     # Set 'Area' dtype to str and deduplicate 'Area'
     data.Area = data.Area.astype('str')
     data.Area = data.Area.apply(deduplication)
+
+    data['Area'] = data['Area'].astype('str')
+    data['Area'] = data['Area'].apply(CleanNone)
     return data
     
 #=========================================================================================================================================      
@@ -219,7 +232,9 @@ def Clean_LSalary(data):
         if data['Lo_Salary'][index] == 'Up ':
             num = int(rng.integers(20, int(re.match('[^0-9]*(\d+)\.*\d*\s*',data['Hi_Salary'][index]).group(1))))
             data.loc[index, 'Lo_Salary'] = num * 8 * 20 * 10
-
+    
+    data['Lo_Salary'] = data['Lo_Salary'].astype('str')
+    data['Lo_Salary'] = data['Lo_Salary'].apply(CleanNone)
     return data
 
 #=========================================================================================================================================        
@@ -246,14 +261,24 @@ def Clean_HSalary(data):
                 num = rng.integers(max(min_LS,float(data['Lo_Salary'][i])), max_LS)        
             # if it is some str in 'Lo_Salary' like 'Good salary' or 'bonus plus medical insurance', do noting
             elif re.match('.*[a-z]+\s*$', data['Lo_Salary'][i]):
+                num = 'Unknown'
                 continue
             else:
                 num = rng.integers(min_LS, max_LS)
             data.loc[i, 'Hi_Salary'] = num
-
+    
+    data['Hi_Salary'] = data['Hi_Salary'].astype('str')
+    data['Hi_Salary'] = data['Hi_Salary'].apply(CleanNone)
     return data
 
 #=========================================================================================================================================        
+
+def CleanNone(x):
+    x = x.strip()
+    if x == 'None':
+        x = 'Unknown'
+    return x
+
 
 def Clean(data):
     data = Name_Columns(data)
